@@ -7,8 +7,8 @@ struct playerInfo
 	char playerID;
 };
 
-void PlayerDrop(char board[][7], playerInfo activePlayer);
-int CheckFour(char board[][7], playerInfo activePlayer);
+void PlayerDrop(char board[][7], playerInfo activePlayer, int gameMode);
+int CheckFour(char board[][7], playerInfo activePlayer, int gameMode);
 int FullBoard(char board[][7]);
 void PlayerWin(playerInfo activePlayer);
 int restart(char board[][7]);
@@ -33,11 +33,11 @@ int main()
 	playerTwo.playerID = 'O';
 
 	//Make loop
-	//cout << "Select A  Game Mode:" << endl;
-	//cout << "1. Normal" << endl;
-	//cout << "2. Wrap Around" << endl;
-	//cout << "3. Cascade" << endl;
-	//cin >> gameMode;
+	cout << "Select A  Game Mode:" << endl;
+	cout << "1. Normal" << endl;
+	cout << "2. Wrap Around" << endl;
+	cout << "3. Cascade" << endl;
+	cin >> gameMode;
 
 	full = 0;
 	win = 0;
@@ -45,10 +45,10 @@ int main()
 	do
 	{
 		DisplayBoard(board);
-		PlayerDrop(board, playerOne);
+		PlayerDrop(board, playerOne, gameMode);
 
 
-		win = CheckFour(board, playerOne);
+		win = CheckFour(board, playerOne, gameMode);
 		if (win == 1)
 		{
 			DisplayBoard(board);
@@ -63,10 +63,10 @@ int main()
 		}
 
 		DisplayBoard(board);
-		PlayerDrop(board, playerTwo);
+		PlayerDrop(board, playerTwo,gameMode);
 
 
-		win = CheckFour(board, playerTwo);
+		win = CheckFour(board, playerTwo,gameMode);
 		if (win == 1)
 		{
 			DisplayBoard(board);
@@ -99,44 +99,74 @@ int main()
 }
 // Checks if you can drop in the given column- ie not full column
 
-void PlayerDrop(char board[][7], playerInfo activePlayer)
+void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 {
-	int dropChoice;
+	int choice,option;
 	int length, turn;
+	int i = 0;
 	length = 5;
 	turn = 0;
+	option = 1;
 	cout << activePlayer.playerName << "'s Turn ";
 	do
 	{
 
 		cout << "Please select a column between 1 and 7: ";
-		cin >> dropChoice;
+		cin >> choice;
 
-		if (dropChoice > 7 || dropChoice < 1)
+		if (choice > 7 || choice < 1)
 		{
 			cout << "Enter a valid column number" << endl;
 			
 		}
 
-			while (board[0][dropChoice-1] == 'X' || board[0][dropChoice-1] == 'O')
+		if (gameMode==3)
 		{
-			cout << "That column is full, please select a new column: ";
-			cin >> dropChoice;
+			cout << "Do you want to add or remove a token- add(1) | remove (2)" << endl;
+			cin >> option;
 		}
-
-	} while (dropChoice < 1 || dropChoice > 7);
-
-	
-	do
-	{
-		if (board[length][dropChoice-1] != 'X' && board[length][dropChoice-1] != 'O')
+		
+		if (option == 2) 
 		{
-			board[length][dropChoice-1] = activePlayer.playerID;
-			turn = 1;
+			if (activePlayer.playerID == board[5][choice - 1])
+			{
+				for (i = 5; i >= 1; i--)
+				{
+					board[i][choice - 1] = board[i - 1][choice - 1];
+				}
+				board[0][choice - 1] = '*';
+			}
+			else
+			{
+				cout << "Bottom Token of the column does not belong to " << activePlayer.playerName;
+				choice = 0;
+			}
 		}
 		else
-			--length;
-	} while (turn != 1);
+		{
+			while (board[0][choice - 1] == 'X' || board[0][choice - 1] == 'O')
+			{
+				cout << "That column is full, please select a new column: ";
+				cin >> choice;
+			}
+			do
+			{
+				if (board[length][choice - 1] != 'X' && board[length][choice - 1] != 'O')
+				{
+					board[length][choice - 1] = activePlayer.playerID;
+					turn = 1;
+				}
+				else
+					--length;
+			} while (turn != 1);
+		}
+
+		
+
+	} while (choice < 1 || choice > 7);
+
+	
+	
 }
 
 void DisplayBoard(char board[][7])
@@ -161,14 +191,13 @@ void DisplayBoard(char board[][7])
 
 }
 
-int CheckFour(char board[][7], playerInfo activePlayer)
+int CheckFour(char board[][7], playerInfo activePlayer, int gameMode)
 {
 	char XO;
 	int win;
 
 	XO = activePlayer.playerID;
 	win = 0;
-
 	for (int i = 5; i >= 0; --i)
 	{
 
