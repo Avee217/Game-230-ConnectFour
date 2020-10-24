@@ -7,7 +7,7 @@ struct playerInfo
 	char playerID;
 };
 
-int PlayerDrop(char board[][7], playerInfo activePlayer);
+void PlayerDrop(char board[][7], playerInfo activePlayer);
 int CheckFour(char board[][7], playerInfo activePlayer);
 int FullBoard(char board[][7]);
 void PlayerWin(playerInfo activePlayer);
@@ -20,7 +20,7 @@ int main()
 	char board[6][7]; // need to change values for better board-too big
 	int trueWidth = 7; // not used	 
 	int trueLength = 6; //not used 
-	int dropChoice, win, full, again, gameMode;
+	int win, full, again, gameMode;
 
 	gameMode = 1;
 
@@ -33,11 +33,11 @@ int main()
 	playerTwo.playerID = 'O';
 
 	//Make loop
-	cout << "Select A  Game Mode:" << endl;
-	cout << "1. Normal" << endl;
-	cout << "2. Wrap Around" << endl;
-	cout << "3. Cascade" << endl;
-	cin >> gameMode;
+	//cout << "Select A  Game Mode:" << endl;
+	//cout << "1. Normal" << endl;
+	//cout << "2. Wrap Around" << endl;
+	//cout << "3. Cascade" << endl;
+	//cin >> gameMode;
 
 	full = 0;
 	win = 0;
@@ -99,7 +99,7 @@ int main()
 }
 // Checks if you can drop in the given column- ie not full column
 
-int PlayerDrop(char board[][7], playerInfo activePlayer)
+void PlayerDrop(char board[][7], playerInfo activePlayer)
 {
 	int dropChoice;
 	int length, turn;
@@ -111,12 +111,14 @@ int PlayerDrop(char board[][7], playerInfo activePlayer)
 
 		cout << "Please select a column between 1 and 7: ";
 		cin >> dropChoice;
+
 		if (dropChoice > 7 || dropChoice < 1)
 		{
 			cout << "Enter a valid column number" << endl;
+			
 		}
 
-		while (board[1][dropChoice] == 'X' || board[1][dropChoice] == 'O')
+			while (board[0][dropChoice-1] == 'X' || board[0][dropChoice-1] == 'O')
 		{
 			cout << "That column is full, please select a new column: ";
 			cin >> dropChoice;
@@ -124,15 +126,12 @@ int PlayerDrop(char board[][7], playerInfo activePlayer)
 
 	} while (dropChoice < 1 || dropChoice > 7);
 
-	dropChoice -= 1;
-
-
-
+	
 	do
 	{
-		if (board[length][dropChoice] != 'X' && board[length][dropChoice] != 'O')
+		if (board[length][dropChoice-1] != 'X' && board[length][dropChoice-1] != 'O')
 		{
-			board[length][dropChoice] = activePlayer.playerID;
+			board[length][dropChoice-1] = activePlayer.playerID;
 			turn = 1;
 		}
 		else
