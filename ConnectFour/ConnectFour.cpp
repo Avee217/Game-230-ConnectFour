@@ -1,6 +1,6 @@
 #include <iostream>
-#include <cstdlib> 
 using namespace std;
+
 //Structure containing player details
 struct playerInfo
 {
@@ -8,12 +8,12 @@ struct playerInfo
 	char playerID;
 };
 
-void PlayerDrop(char board[][7], playerInfo activePlayer, int gameMode);
-int CheckFour(char board[][7], playerInfo activePlayer, int gameMode);
-int FullBoard(char board[][7]);
-void PlayerWin(playerInfo activePlayer);
-int restart(char board[][7]);
-void DisplayBoard(char board[][7]);
+void PlayerDrop(char board[][7], playerInfo activePlayer, int gameMode); //Drops token into column | In game mode 2 removes token as well
+int CheckFour(char board[][7], playerInfo activePlayer, int gameMode); // checks for win conditions in normal and wrap mode
+int FullBoard(char board[][7]); //checks if board is full
+void PlayerWin(playerInfo activePlayer); //Displays the winner
+int restart(char board[][7]); // restarts the game
+void DisplayBoard(char board[][7]); // Displays the current board state
 
 int main()
 {
@@ -33,7 +33,7 @@ int main()
 	cin >> playerTwo.playerName;
 	playerTwo.playerID = 'O';
 
-	//Make loop- restart
+	// Game start
 	do
 	{
 		full = 0;
@@ -70,6 +70,22 @@ int main()
 				else
 					continue;
 			}
+			if (gameMode == 3)
+			{
+				win = CheckFour(board, playerTwo, gameMode);
+				if (win == 1)
+				{
+					DisplayBoard(board);
+					PlayerWin(playerTwo);
+					again = restart(board);
+					if (again == 2)
+					{
+						break;
+					}
+					else
+						continue;
+				}
+			}
 
 			DisplayBoard(board);
 			PlayerDrop(board, playerTwo, gameMode);
@@ -87,7 +103,22 @@ int main()
 				else
 					continue;
 			}
-			// do this again
+			if (gameMode == 3)
+			{
+				win = CheckFour(board, playerOne, gameMode);
+				if (win == 1)
+				{
+					DisplayBoard(board);
+					PlayerWin(playerOne);
+					again = restart(board);
+					if (again == 2)
+					{
+						break;
+					}
+					else
+						continue;
+				}
+			}
 			full = FullBoard(board);
 			if (full == 7)
 			{
@@ -96,6 +127,9 @@ int main()
 					cout << "The board is full, it is a draw!" << endl;
 					DisplayBoard(board);
 					again = restart(board);
+					if (again != 2)
+						win = 1;
+
 				}
 
 			}
@@ -120,7 +154,13 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 	cout << activePlayer.playerName << "'s Turn ";
 	do
 	{
-
+	lable:
+		if (gameMode == 3)
+		{
+			
+			cout << "Do you want to add or remove a token- add(1) | remove (2)" << endl;
+				cin >> option;
+		}
 		cout << "Please select a column between 1 and 7: ";
 		cin >> choice;
 
@@ -131,14 +171,6 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 		}
 		else
 		{
-
-
-			if (gameMode == 3)
-			{
-				cout << "Do you want to add or remove a token- add(1) | remove (2)" << endl;
-				cin >> option;
-			}
-
 			if (option == 2)
 			{
 				if (activePlayer.playerID == board[5][choice - 1])
@@ -151,7 +183,7 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 				}
 				else
 				{
-					cout << "Bottom Token of the column does not belong to " << activePlayer.playerName;
+					cout << "Bottom Token of the column "<<choice<<" does not belong to " << activePlayer.playerName<<endl;
 					choice = 0;
 				}
 			}
@@ -159,8 +191,8 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 			{
 				while (board[0][choice - 1] == 'X' || board[0][choice - 1] == 'O')
 				{
-					cout << "That column is full, please select a new column: ";
-					cin >> choice;
+					cout << "That column is full "<<endl;
+					goto lable;
 				}
 				do
 				{
@@ -224,15 +256,17 @@ int CheckFour(char board[][7], playerInfo activePlayer, int gameMode)
 
 			if (gameMode == 2)
 			{
-				// Diagonal down wrapping
-				if (board[(i)][(ix) % 7] == XO &&
-					board[(i + 1)][(ix + 1) % 7] == XO &&
-					board[(i + 2)][(ix + 2) % 7] == XO &&
-					board[(i + 3)][(ix + 3) % 7] == XO)
+				// Diagonal right down wrapping
+				if (i < 3) 
 				{
-					win = 1;
+					if (board[(i)][(ix) % 7] == XO &&
+						board[(i + 1)][(ix + 1) % 7] == XO &&
+						board[(i + 2)][(ix + 2) % 7] == XO &&
+						board[(i + 3)][(ix + 3) % 7] == XO)
+					{
+						win = 1;
+					}
 				}
-
 				// Diagonal right up wrapping
 				if (board[(i)][(ix) % 7] == XO &&
 					board[(i - 1)][(ix + 1) % 7] == XO &&
