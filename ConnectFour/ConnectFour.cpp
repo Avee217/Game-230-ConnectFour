@@ -19,11 +19,7 @@ int main()
 {
 	playerInfo playerOne, playerTwo;
 	char board[6][7]; 
-	int trueWidth = 7; // not used	 
-	int trueLength = 6; //not used 
 	int win, full, again, gameMode;
-
-
 
 	cout << "Let's Play Connect 4" << endl << endl;
 	cout << "Player One please enter your name: ";
