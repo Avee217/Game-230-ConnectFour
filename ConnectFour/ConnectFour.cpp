@@ -8,8 +8,8 @@ struct playerInfo
 	char playerID;
 };
 
-void PlayerDrop(char board[][7], playerInfo activePlayer, int gameMode); //Drops token into column | In game mode 2 removes token as well
-int CheckFour(char board[][7], playerInfo activePlayer, int gameMode); // checks for win conditions in normal and wrap mode
+void PlayerDrop(char board[][7], playerInfo activePlayer, char gameMode); //Drops token into column | In game mode 2 removes token as well
+int CheckFour(char board[][7], playerInfo activePlayer, char gameMode); // checks for win conditions in normal and wrap mode
 int FullBoard(char board[][7]); //checks if board is full
 void PlayerWin(playerInfo activePlayer); //Displays the winner
 int restart(char board[][7]); // restarts the game
@@ -18,8 +18,9 @@ void DisplayBoard(char board[][7]); // Displays the current board state
 int main()
 {
 	playerInfo playerOne, playerTwo;
-	char board[6][7]; 
-	int win, full, again, gameMode;
+	char gameMode,board[6][7];
+	int winx, wino, full, again;
+
 
 	cout << "Let's Play Connect 4" << endl << endl;
 	cout << "Player One please enter your name: ";
@@ -33,7 +34,8 @@ int main()
 	do
 	{
 		full = 0;
-		win = 0;
+		winx = 0;
+		wino = 0;
 		again = 0;
 		gameMode = 1;
 		cout << "Select A  Game Mode:" << endl;
@@ -41,20 +43,37 @@ int main()
 		cout << "2. Wrap Around" << endl;
 		cout << "3. Cascade" << endl;
 		cin >> gameMode;
-		
-		if (gameMode != 1 && gameMode != 2 && gameMode != 3)
+
+		if (gameMode != '1' && gameMode != '2' && gameMode != '3')
 		{
 			cout << "Enter a Valid Game Mode";
 			continue;
 		}
-		
+
 		do
 		{
 			DisplayBoard(board);
+			
 			PlayerDrop(board, playerOne, gameMode);
-
-			win = CheckFour(board, playerOne, gameMode);
-			if (win == 1)
+			winx = CheckFour(board, playerOne, gameMode);
+			if (gameMode == '3')
+			{
+				wino = CheckFour(board, playerTwo, gameMode);
+				if (wino == 2 && winx != 1)
+				{
+					DisplayBoard(board);
+					PlayerWin(playerTwo);
+					again = restart(board);
+					if (again == 2)
+					{
+						break;
+					}
+					else
+						continue;
+					
+				}
+			}
+			if (winx == 1 && wino != 2)
 			{
 				DisplayBoard(board);
 				PlayerWin(playerOne);
@@ -66,43 +85,14 @@ int main()
 				else
 					continue;
 			}
-			if (gameMode == 3)
-			{
-				win = CheckFour(board, playerTwo, gameMode);
-				if (win == 1)
-				{
-					DisplayBoard(board);
-					PlayerWin(playerTwo);
-					again = restart(board);
-					if (again == 2)
-					{
-						break;
-					}
-					else
-						continue;
-				}
-			}
-
+			
 			DisplayBoard(board);
+			
 			PlayerDrop(board, playerTwo, gameMode);
-
-			win = CheckFour(board, playerTwo, gameMode);
-			if (win == 1)
-			{
-				DisplayBoard(board);
-				PlayerWin(playerTwo);
-				again = restart(board);
-				if (again == 2)
-				{
-					break;
-				}
-				else
-					continue;
-			}
-			if (gameMode == 3)
-			{
-				win = CheckFour(board, playerOne, gameMode);
-				if (win == 1)
+			wino = CheckFour(board, playerTwo, gameMode);
+			if (gameMode == '3') {
+				winx = CheckFour(board, playerOne, gameMode);
+				if (winx == 1 && wino != 2)
 				{
 					DisplayBoard(board);
 					PlayerWin(playerOne);
@@ -115,21 +105,49 @@ int main()
 						continue;
 				}
 			}
+			if (wino == 2 && winx != 1)
+			{
+				DisplayBoard(board);
+				PlayerWin(playerTwo);
+				again = restart(board);
+				if (again == 2)
+				{
+					break;
+				}
+				else
+					continue;
+			}
+			
+			if (winx == 1 && wino == 2)
+			{
+				DisplayBoard(board);
+				cout << " The game is a draw" << endl;
+				again = restart(board);
+				if (again != 2)
+				{
+					winx = 1;
+					wino = 2;
+				}
+			}
 			full = FullBoard(board);
 			if (full == 7)
 			{
-				if (win == 0)
+				if (winx == 0 && wino == 0)
 				{
-					cout << "The board is full, it is a draw!" << endl;
+					cout << "The board is full!" << endl;
 					DisplayBoard(board);
 					again = restart(board);
 					if (again != 2)
-						win = 1;
+					{
+						winx = 1;
+						wino = 2;
+					}
 
 				}
 
 			}
-		} while (win != 1);
+			
+		} while (winx != 1 || wino != 2);
 
 	} while (again != 2);
 
@@ -139,9 +157,9 @@ int main()
 }
 // Checks if you can drop in the given column- ie not full column
 
-void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
+void PlayerDrop(char board[][7], playerInfo activePlayer, char gameMode)
 {
-	int choice,option;
+	int choice, option;
 	int length, turn;
 	int i = 0;
 	length = 5;
@@ -151,11 +169,11 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 	do
 	{
 	lable:
-		if (gameMode == 3)
+		if (gameMode == '3')
 		{
-			
+
 			cout << "Do you want to add or remove a token- add(1) | remove (2)" << endl;
-				cin >> option;
+			cin >> option;
 		}
 		cout << "Please select a column between 1 and 7: ";
 		cin >> choice;
@@ -163,7 +181,7 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 		if (choice > 7 || choice < 1)
 		{
 			cout << "Enter a valid column number" << endl;
-			
+
 		}
 		else
 		{
@@ -179,7 +197,7 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 				}
 				else
 				{
-					cout << "Bottom Token of the column "<<choice<<" does not belong to " << activePlayer.playerName<<endl;
+					cout << "Bottom Token of the column " << choice << " does not belong to " << activePlayer.playerName << endl;
 					choice = 0;
 				}
 			}
@@ -187,7 +205,7 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 			{
 				while (board[0][choice - 1] == 'X' || board[0][choice - 1] == 'O')
 				{
-					cout << "That column is full "<<endl;
+					cout << "That column is full " << endl;
 					goto lable;
 				}
 				do
@@ -205,12 +223,12 @@ void PlayerDrop(char board[][7], playerInfo activePlayer,int gameMode)
 				} while (turn != 1);
 			}
 		}
-		
+
 
 	} while (choice < 1 || choice > 7);
 
-	
-	
+
+
 }
 
 void DisplayBoard(char board[][7])
@@ -235,25 +253,25 @@ void DisplayBoard(char board[][7])
 
 }
 
-int CheckFour(char board[][7], playerInfo activePlayer, int gameMode)
+int CheckFour(char board[][7], playerInfo activePlayer, char gameMode)
 {
 	char XO;
-	int win,a,b,c;
+	int win, a, b, c;
 
 	XO = activePlayer.playerID;
 	win = 0;
-	
+
 	for (int i = 5; i >= 0; --i)
 	{
-		
+
 		for (int ix = 6; ix >= 0; --ix)
 		{
-			
 
-			if (gameMode == 2)
+
+			if (gameMode == '2')
 			{
 				// Diagonal right down wrapping
-				if (i < 3) 
+				if (i < 3)
 				{
 					if (board[(i)][(ix) % 7] == XO &&
 						board[(i + 1)][(ix + 1) % 7] == XO &&
@@ -297,24 +315,24 @@ int CheckFour(char board[][7], playerInfo activePlayer, int gameMode)
 			if ((ix > 2))
 			{
 				if (board[i][ix] == XO &&
-					board[i][ix-1] == XO &&
-					board[i][ix-2] == XO &&
-					board[i][ix-3] == XO)
+					board[i][ix - 1] == XO &&
+					board[i][ix - 2] == XO &&
+					board[i][ix - 3] == XO)
 				{
 					win = 1;
 				}
 			}
 
 			//Diagonal 
-			if(i > 2)
+			if (i > 2)
 			{
 				// Left up
-				if (ix > 2 )
+				if (ix > 2)
 				{
 					if (board[i][ix] == XO &&
-						board[i - 1][ix-1] == XO &&
-						board[i - 2][ix-2] == XO &&
-						board[i - 3][ix-3] == XO)
+						board[i - 1][ix - 1] == XO &&
+						board[i - 2][ix - 2] == XO &&
+						board[i - 3][ix - 3] == XO)
 					{
 						win = 1;
 					}
@@ -330,12 +348,19 @@ int CheckFour(char board[][7], playerInfo activePlayer, int gameMode)
 						win = 1;
 					}
 				}
-			
+
 			}
 		}
 
 	}
 
+	if (win == 1)
+	{
+		if (XO == 'X')
+			win = 1;
+		else
+			win = 2;
+	}
 	return win;
 }
 
